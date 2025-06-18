@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://deqn3nx3jd2ly"]
+
+[ext_resource type="PackedScene" uid="uid://c1hykqudngm8k" path="res://multimesh_test.blend" id="1_dybue"]
+
+[node name="psys_test" instance=ExtResource("1_dybue")]
