@@ -3,34 +3,6 @@ extends GLTFDocumentExtension
 class_name GLTFMultimeshes 
 
 
-func bytes_to_vec3(buffer_bytes: PackedByteArray):
-	# godot cannot do this, yeeeep.
-	# https://github.com/godotengine/godot-proposals/issues/8139
-	# lets wait i guess, if only 6 months old or smth 
-
-	var buffer_float = buffer_bytes.to_float32_array()
-	
-	var result = PackedVector3Array()
-	result.resize(buffer_float.size() / 3)
-	
-	for i in range(0, buffer_float.size(), 3):
-		result[i / 3] = Vector3(buffer_float[i], buffer_float[i + 1], buffer_float[i + 2])
-		
-	return result
-
-
-func bytes_to_vec4(buffer_bytes: PackedByteArray):
-	var buffer_float = buffer_bytes.to_float32_array()
-	
-	var result = PackedVector4Array()
-	result.resize(buffer_float.size() / 4)
-	
-	for i in range(0, buffer_float.size(), 4):
-		result[i / 4] = Vector4(buffer_float[i], buffer_float[i + 1], buffer_float[i + 2], buffer_float[i + 3])
-		
-	return result
-
-
 func process_gpu_instancing(state: GLTFState, gltf_node: GLTFNode, json: Dictionary, node: Node):
 	# TODO option to skipping bad transforms instead of return
 	
@@ -64,7 +36,7 @@ func process_gpu_instancing(state: GLTFState, gltf_node: GLTFNode, json: Diction
 			
 		var buffer_view = buffer_views[translation_index]
 		var buffer_bytes = buffer_view.load_buffer_view_data(state)
-		translation = bytes_to_vec3(buffer_bytes)
+		translation = buffer_bytes.to_vector3_array()
 		instance_count = translation.size()
 	
 	var rotation_index = attributes.get('ROTATION')
@@ -79,7 +51,7 @@ func process_gpu_instancing(state: GLTFState, gltf_node: GLTFNode, json: Diction
 		
 		var buffer_view = buffer_views[rotation_index]
 		var buffer_bytes = buffer_view.load_buffer_view_data(state)
-		rotation = bytes_to_vec4(buffer_bytes)
+		rotation = buffer_bytes.to_vector4_array()
 		if instance_count and instance_count != rotation.size():
 			push_error('bad instance count: %s!=%s' % [instance_count, rotation.size()])
 			return ERR_INVALID_DATA
@@ -96,7 +68,7 @@ func process_gpu_instancing(state: GLTFState, gltf_node: GLTFNode, json: Diction
 		
 		var buffer_view = buffer_views[scale_index]
 		var buffer_bytes = buffer_view.load_buffer_view_data(state)
-		scale = bytes_to_vec3(buffer_bytes)
+		scale = buffer_bytes.to_vector3_array()
 		if instance_count and instance_count != scale.size():
 			push_error('bad instance count: %s!=%s' % [instance_count, scale.size()])
 			return ERR_INVALID_DATA
